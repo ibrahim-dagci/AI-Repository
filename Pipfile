@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+ollama = "*"
+chromadb = "*"
+fitz = "*"
+pymupdf = "*"
+seaborn = "*"
+matplotlib = "*"
+scikit-learn = "*"
+openpyxl = "*"
+
+[scripts]
+start = "python index.py"
+start2 = "python preprocessing/index.py"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"

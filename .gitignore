@@ -1,0 +1,8 @@
+.DS_Store
+.venv
+*/chroma
+*.lock
+*.env
+*.docx
+*.xlsx
+
