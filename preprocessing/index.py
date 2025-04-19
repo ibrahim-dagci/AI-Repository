@@ -26,6 +26,8 @@ plt.title('Eksik Veriler')
 plt.show()
 
 # Veri temizleme & doldurma
+df , _ = exclude_columns(df,["id","zaman damgasi","zaman damgası","Yaşadığınız yer (Mahayıralle/Sokak)"])
+
 for col in df.columns:
     if df[col].dtype == 'object':  # Kategorik değişkenler
         df[col].fillna(df[col].mode()[0], inplace=True)  # En sık tekrar eden değerle doldur
@@ -36,26 +38,30 @@ for col in df.columns:
             df[col].fillna(df[col].median(), inplace=True)  # Medyan ile doldur
 
 # Aykırı Değerleri Tespit Etme (IQR & Z-Score)
-df_processed, disqualified_columns = exclude_columns(df, ["id", "ID"])
 plt.figure(figsize=(10, 5))
-sns.boxplot(data=df_processed.select_dtypes(include=[np.number]))
+sns.boxplot(data=df.select_dtypes(include=[np.number]))
 plt.xticks(rotation=90)
 plt.title("Aykırı Değerler")
 plt.show()
 
 # Aykırı değerleri temizleme (Winsorizing - uç değerleri kırpma)
-for col in df_processed.select_dtypes(include=[np.number]).columns:
-    z_scores = np.abs(stats.zscore(df_processed[col]))  # Z-score hesaplama
-    df_processed[col] = np.where(z_scores > 3, df_processed[col].median(), df_processed[col])  # Z-score > 3 olanları medyan ile değiştir
+for col in df.select_dtypes(include=[np.number]).columns:
+    z_scores = np.abs(stats.zscore(df[col]))  # Z-score hesaplama
+    df[col] = np.where(z_scores > 3, df[col].median(), df[col])  # Z-score > 3 olanları medyan ile değiştir
 
-df_processed = concat_disqualified_col(df_processed, df, disqualified_columns)
-df_processed_final, disqualified_columns = exclude_columns(df, ["id", "ID","yaş"])
+df_processed = df
+df_processed_final, disqualified_columns = exclude_columns(df_processed, ["yaş"])
 
 # Kategorik Değişkenleri Belirleme
 categorical_cols = df_processed_final.select_dtypes(include=['object']).columns
 binary_cols = [col for col in categorical_cols if df_processed_final[col].nunique() == 2]
 multi_class_cols = [col for col in categorical_cols if df_processed_final[col].nunique() > 2]
-
+print("-------------------------------------")
+print(categorical_cols)
+print("-------------------------------------")
+print(binary_cols)
+print("-------------------------------------")
+print(multi_class_cols)
 # Binary Kategorik Değişkenler için Label Encoding
 label_encoder = LabelEncoder()
 for col in binary_cols:
